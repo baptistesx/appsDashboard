@@ -30,5 +30,19 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
       yield AppsInitial();
       // .catchError((e) => yield Error("error"));
     }
+    if (event is LaunchOpenConfirmActionDialog) {
+      if (event.action == "DELETE") {
+        appsList.removeAt(event.appIndex);
+        storage.writeApps(appsList);
+        yield AppDeleted("App well deleted");
+      }
+      yield AppsInitial();
+    }
+    if (event is LaunchUpdateApp) {
+      appsList[event.index].name = event.newName;
+      appsList[event.index].path = event.newPath;
+      yield AppUpdated("App well updated");
+    }
+    yield AppsInitial();
   }
 }

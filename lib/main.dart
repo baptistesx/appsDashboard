@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lachenal_app/pages/home_page.dart';
+import 'package:lachenal_app/route_generator.dart';
 import 'bloc/apps_bloc.dart';
 import 'utils/apps_storage.dart';
 
 import 'models/executable_app.dart';
-import 'pages/home_page.dart';
+import 'pages/apps_page.dart';
 
 AppsStorage storage = AppsStorage();
 List<ExecutableApp> appsList = [];
@@ -32,8 +34,8 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home:
-              HomePage(title: 'Lachenal BTS Bois apps', storage: AppsStorage()),
+          initialRoute: '/',
+          onGenerateRoute: RouteGenerator.generateRoute,
         ));
   }
 }

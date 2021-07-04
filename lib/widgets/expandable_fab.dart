@@ -5,7 +5,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/apps_bloc.dart';
-import 'create_app_form_dialog.dart';
+import 'app_form_dialog.dart';
 
 @immutable
 class CustomExpandableFab extends StatelessWidget {
@@ -17,7 +17,7 @@ class CustomExpandableFab extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) {
-        return CreateAppFormDialog();
+        return AppFormDialog(index: null);
       },
     );
   }

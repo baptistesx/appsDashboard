@@ -1,29 +1,49 @@
 // Create a Form widget.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:lachenal_app/bloc/apps_bloc.dart';
 import 'package:lachenal_app/main.dart';
 import 'package:lachenal_app/models/executable_app.dart';
 import 'package:lachenal_app/resources/globals.dart';
 
-class CreateAppFormDialog extends StatefulWidget {
+class AppFormDialog extends StatefulWidget {
+  final int? index;
+
+  const AppFormDialog({Key? key, required this.index}) : super(key: key);
+
   @override
-  CreateAppFormDialogState createState() {
-    return CreateAppFormDialogState();
+  AppFormDialogState createState() {
+    return AppFormDialogState();
   }
 }
 
 // Create a corresponding State class.
 // This class holds data related to the form.
-class CreateAppFormDialogState extends State<CreateAppFormDialog> {
+class AppFormDialogState extends State<AppFormDialog> {
   // Create a global key that uniquely identifies the Form widget
   // and allows validation of the form.
   //
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
-  final nameController = TextEditingController();
-  final pathController = TextEditingController();
+  var nameController = TextEditingController();
+  var pathController = TextEditingController();
+  bool isCreateDialog = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.index != null) {
+      nameController =
+          new TextEditingController(text: appsList[widget.index!].name);
+      pathController =
+          new TextEditingController(text: appsList[widget.index!].path);
+    }
+
+    isCreateDialog = widget.index == null;
+  }
 
   @override
   void dispose() {
@@ -42,7 +62,7 @@ class CreateAppFormDialogState extends State<CreateAppFormDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text("Add a new app"),
+            isCreateDialog ? Text("Add a new app") : Text("Edit the app"),
             TextFormField(
               controller: nameController,
               // The validator receives the text that the user has entered.
@@ -77,8 +97,15 @@ class CreateAppFormDialogState extends State<CreateAppFormDialog> {
           onPressed: () {
             // Validate returns true if the form is valid, or false otherwise.
             if (_formKey.currentState!.validate()) {
-              BlocProvider.of<AppsBloc>(context).add(LaunchCreateApp(
-                  ExecutableApp(nameController.text, pathController.text)));
+              if (isCreateDialog) {
+                BlocProvider.of<AppsBloc>(context).add(LaunchCreateApp(
+                    ExecutableApp(nameController.text, pathController.text)));
+              } else {
+                BlocProvider.of<AppsBloc>(context).add(LaunchUpdateApp(
+                    index: widget.index!,
+                    newName: nameController.text,
+                    newPath: pathController.text));
+              }
 
               // appsList.add(ExecutableApp(, path))
               // If the form is valid, display a snackbar. In the real world,
