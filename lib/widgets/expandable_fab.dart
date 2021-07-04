@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/apps_bloc.dart';
 import 'create_app_form_dialog.dart';
 
 @immutable
