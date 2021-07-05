@@ -41,7 +41,7 @@ class CategoryFormDialogState extends State<CategoryFormDialog> {
 
     if (widget.index != null) {
       nameController =
-          TextEditingController(text: appsList[widget.index!].name);
+          TextEditingController(text: categoriesList[widget.index!].name);
     }
 
     isCreateDialog = widget.index == null;

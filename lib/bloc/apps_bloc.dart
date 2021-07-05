@@ -48,18 +48,29 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
       appsList[event.index].name = event.newName;
       appsList[event.index].path = event.newPath;
       appsList[event.index].categoryValue = event.newCategoryValue;
+      appsStorage.writeApps(appsList);
+
       yield AppUpdated("App well updated");
     }
     if (event is LaunchCreateCategory) {
       categoriesList.add(event.category);
-      categoriesStorage.writeApps(categoriesList);
+      categoriesStorage.writeCategories(categoriesList);
 
       yield CategoryCreated("Category well created");
       yield AppsInitial();
     }
     if (event is LaunchUpdateCategory) {
+      appsList = appsList.map((e) {
+        if (e.categoryValue == categoriesList[event.index].value) {
+          e.categoryValue = event.category.value;
+        }
+        return e;
+      }).toList();
+      appsStorage.writeApps(appsList);
+
       categoriesList[event.index].name = event.category.name;
       categoriesList[event.index].value = event.category.value;
+      categoriesStorage.writeCategories(categoriesList);
       yield CategoryUpdated("Category well updated");
     }
     yield AppsInitial();

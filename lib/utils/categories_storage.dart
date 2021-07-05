@@ -35,7 +35,7 @@ class CategoriesStorage {
     }
   }
 
-  Future<File> writeApps(List<Category> apps) async {
+  Future<File> writeCategories(List<Category> apps) async {
     final file = await _localFile;
 
     String appsListString = jsonEncode(apps);
