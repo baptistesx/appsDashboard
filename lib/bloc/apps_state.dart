@@ -13,14 +13,36 @@ class ErrorLaunchingApp extends AppsState {
   ErrorLaunchingApp(this.message);
 }
 
-class AppLaunched extends AppsState {
+abstract class SuccessActionState extends AppsState {
   final String message;
 
-  AppLaunched(this.message);
+  SuccessActionState(this.message);
 }
 
-class AppCreated extends AppsState {
-  final String message;
+class AppLaunched extends SuccessActionState {
+  AppLaunched(String message) : super(message);
+}
 
-  AppCreated(this.message);
+class AppCreated extends SuccessActionState {
+  AppCreated(String message) : super(message);
+}
+
+class AppDialogOpened extends AppsState {
+  AppDialogOpened();
+}
+
+class AppDeleted extends SuccessActionState {
+  AppDeleted(String message) : super(message);
+}
+
+class AppUpdated extends AppDeleted {
+  AppUpdated(String message) : super(message);
+}
+
+class CategoryCreated extends SuccessActionState {
+  CategoryCreated(String message) : super(message);
+}
+
+class CategoryUpdated extends AppDeleted {
+  CategoryUpdated(String message) : super(message);
 }
