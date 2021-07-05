@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import '../models/executable_app.dart';
+import '../models/category.dart';
 import 'package:path_provider/path_provider.dart';
 
-class AppsStorage {
+import '../models/executable_app.dart';
+
+class CategoriesStorage {
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
 
@@ -13,10 +15,10 @@ class AppsStorage {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/apps.json');
+    return File('$path/categories.json');
   }
 
-  Future<List<ExecutableApp>> readEntities() async {
+  Future<List<Category>> readEntities() async {
     try {
       final file = await _localFile;
 
@@ -24,8 +26,7 @@ class AppsStorage {
       final contents = await file.readAsString();
 
       var tagsJson = jsonDecode(contents) as List;
-      List<ExecutableApp> tags =
-          tagsJson.map((e) => ExecutableApp.fromJson(e)).toList();
+      List<Category> tags = tagsJson.map((e) => Category.fromJson(e)).toList();
 
       return tags;
     } catch (e) {
@@ -34,7 +35,7 @@ class AppsStorage {
     }
   }
 
-  Future<File> writeApps(List<ExecutableApp> apps) async {
+  Future<File> writeCategories(List<Category> apps) async {
     final file = await _localFile;
 
     String appsListString = jsonEncode(apps);
