@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../widgets/categories_list.dart';
+import '../widgets/pin_code_form_dialog.dart';
 
 import '../bloc/apps_bloc.dart';
 import '../models/executable_app.dart';
 import '../resources/globals.dart' as globals;
 import '../resources/globals.dart';
 import '../utils/apps_storage.dart';
-import '../widgets/executable_apps_list.dart';
-import '../widgets/executable_button.dart';
+import '../widgets/app_card.dart';
 import '../widgets/expandable_fab.dart';
 
 class AppsPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class AppsPage extends StatefulWidget {
 
 class _AppsPageState extends State<AppsPage> {
   String dropdownValue = 'One';
-  bool isAdmin = false;
+  bool isAdmin = true;
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +33,15 @@ class _AppsPageState extends State<AppsPage> {
               Text("Administrateur"),
               Switch(
                 value: isAdmin,
-                onChanged: (value) {
-                  setState(() {
-                    isAdmin = value;
-                    print(isAdmin);
-                  });
+                onChanged: (isOn) {
+                  if (isOn) {
+                    showPinCodeDialog(context);
+                  } else {
+                    setState(() {
+                      isAdmin = false;
+                    });
+                  }
+                  // open dialog
                 },
                 activeTrackColor: Colors.lightGreenAccent,
                 activeColor: Colors.green,
@@ -71,9 +76,29 @@ class _AppsPageState extends State<AppsPage> {
 
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }, builder: (context, state) {
-          return Center(child: ExecutableAppsList(optionsAvailable: isAdmin));
+          return CategoriesList(optionsAvailable: isAdmin);
         }),
-        floatingActionButton: isAdmin ? CustomExpandableFab() : Container());
+        floatingActionButton: BlocBuilder<AppsBloc, AppsState>(
+          builder: (context, state) {
+            return isAdmin ? CustomExpandableFab() : Container();
+          },
+        ));
+  }
+
+  void showPinCodeDialog(BuildContext context) {
+    showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return PinCodeFormDialog();
+      },
+    ).then((valueFromDialog) {
+      if (valueFromDialog == true) {
+        setState(() {
+          isAdmin = true;
+        });
+      }
+    });
+    ;
   }
 }
 

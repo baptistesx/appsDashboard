@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lachenal_app/pages/apps_page.dart';
-import 'package:lachenal_app/pages/home_page.dart';
+import 'pages/apps_page.dart';
+import 'pages/home_page.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -10,7 +10,9 @@ class RouteGenerator {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-            builder: (_) => AppsPage(data: AppsPageParams(title: "Accueil")));
+            builder: (_) => AppsPage(
+                data:
+                    AppsPageParams(title: "Lycée Louis Lachenal - BTS Bois")));
       case '/apps':
         // Validation of correct data type
         if (args is AppsPageParams) {

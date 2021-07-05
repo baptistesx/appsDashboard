@@ -2,20 +2,33 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lachenal_app/pages/home_page.dart';
-import 'package:lachenal_app/route_generator.dart';
+import 'models/category.dart';
+import 'pages/home_page.dart';
+import 'route_generator.dart';
+import 'utils/categories_storage.dart';
 import 'bloc/apps_bloc.dart';
 import 'utils/apps_storage.dart';
 
 import 'models/executable_app.dart';
 import 'pages/apps_page.dart';
 
-AppsStorage storage = AppsStorage();
+AppsStorage appsStorage = AppsStorage();
+CategoriesStorage categoriesStorage = CategoriesStorage();
 List<ExecutableApp> appsList = [];
+List<Category> categoriesList = [];
 
 Future main() async {
-  await storage.readApps().then((List<ExecutableApp> value) {
+  await appsStorage.readEntities().then((List<ExecutableApp> value) {
     appsList = value;
+  });
+
+  await categoriesStorage.readEntities().then((List<Category> value) {
+    categoriesList = value;
+  });
+
+  categoriesList.firstWhere((element) => element.name == "", orElse: () {
+    categoriesList.add(Category(value: "", name: ""));
+    return Category(value: "", name: "");
   });
 
   runApp(const MyApp());

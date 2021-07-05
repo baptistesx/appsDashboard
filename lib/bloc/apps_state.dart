@@ -38,3 +38,11 @@ class AppDeleted extends SuccessActionState {
 class AppUpdated extends AppDeleted {
   AppUpdated(String message) : super(message);
 }
+
+class CategoryCreated extends SuccessActionState {
+  CategoryCreated(String message) : super(message);
+}
+
+class CategoryUpdated extends AppDeleted {
+  CategoryUpdated(String message) : super(message);
+}

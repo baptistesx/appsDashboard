@@ -1,16 +1,18 @@
 // Create a Form widget.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:lachenal_app/bloc/apps_bloc.dart';
 import 'package:lachenal_app/main.dart';
 import 'package:lachenal_app/models/executable_app.dart';
-import 'package:lachenal_app/resources/globals.dart';
+
+import "string_extension.dart";
 
 class AppFormDialog extends StatefulWidget {
   final int? index;
+  final ExecutableApp? app;
 
-  const AppFormDialog({Key? key, required this.index}) : super(key: key);
+  const AppFormDialog({Key? key, required this.index, required this.app})
+      : super(key: key);
 
   @override
   AppFormDialogState createState() {
@@ -30,6 +32,7 @@ class AppFormDialogState extends State<AppFormDialog> {
   var nameController = TextEditingController();
   var pathController = TextEditingController();
   bool isCreateDialog = true;
+  String dropdownValue = '';
 
   @override
   void initState() {
@@ -37,9 +40,13 @@ class AppFormDialogState extends State<AppFormDialog> {
 
     if (widget.index != null) {
       nameController =
-          new TextEditingController(text: appsList[widget.index!].name);
+          TextEditingController(text: appsList[widget.index!].name);
       pathController =
-          new TextEditingController(text: appsList[widget.index!].path);
+          TextEditingController(text: appsList[widget.index!].path);
+      dropdownValue = categoriesList
+          .where((element) => element.value == widget.app!.categoryValue)
+          .first
+          .value;
     }
 
     isCreateDialog = widget.index == null;
@@ -85,6 +92,34 @@ class AppFormDialogState extends State<AppFormDialog> {
               },
               decoration: InputDecoration(hintText: "App path"),
             ),
+            DropdownButtonFormField<String>(
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select the app category';
+                }
+                return null;
+              },
+              value: dropdownValue,
+              onChanged: (String? newValue) {
+                setState(() {
+                  dropdownValue = newValue!;
+                });
+              },
+              items: categoriesList
+                  .map((e) => e.value)
+                  .toList()
+                  .map<DropdownMenuItem<String>>((String value) {
+                return value != ""
+                    ? DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value.capitalize()),
+                      )
+                    : const DropdownMenuItem<String>(
+                        value: "",
+                        child: Text(""),
+                      );
+              }).toList(),
+            )
           ],
         ),
       ),
@@ -96,15 +131,19 @@ class AppFormDialogState extends State<AppFormDialog> {
         ElevatedButton(
           onPressed: () {
             // Validate returns true if the form is valid, or false otherwise.
-            if (_formKey.currentState!.validate()) {
+            if (_formKey.currentState!.validate() && dropdownValue != "") {
               if (isCreateDialog) {
                 BlocProvider.of<AppsBloc>(context).add(LaunchCreateApp(
-                    ExecutableApp(nameController.text, pathController.text)));
+                    ExecutableApp(
+                        name: nameController.text,
+                        path: pathController.text,
+                        categoryValue: dropdownValue)));
               } else {
                 BlocProvider.of<AppsBloc>(context).add(LaunchUpdateApp(
                     index: widget.index!,
                     newName: nameController.text,
-                    newPath: pathController.text));
+                    newPath: pathController.text,
+                    newCategoryValue: dropdownValue));
               }
 
               // appsList.add(ExecutableApp(, path))

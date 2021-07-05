@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import '../models/category.dart';
+import '../resources/globals.dart';
 import '../models/executable_app.dart';
 import 'package:meta/meta.dart';
 
@@ -19,21 +21,25 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
   ) async* {
     if (event is LaunchCreateApp) {
       appsList.add(event.app);
-      storage.writeApps(appsList);
+      appsStorage.writeApps(appsList);
 
       yield AppCreated("App well created");
       yield AppsInitial();
     }
     if (event is LaunchExecuteApp) {
-      ProcessResult results = await Process.run(event.app.path, []);
-      yield AppLaunched("App well launched");
-      yield AppsInitial();
-      // .catchError((e) => yield Error("error"));
+      try {
+        ProcessResult results = await Process.run(event.app.path, []);
+        yield AppLaunched("App well launched");
+        yield AppsInitial();
+      } on ProcessException catch (e) {
+        yield ErrorLaunchingApp("Failed to launch app, check the pathfile");
+        yield AppsInitial();
+      }
     }
     if (event is LaunchOpenConfirmActionDialog) {
-      if (event.action == "DELETE") {
-        appsList.removeAt(event.appIndex);
-        storage.writeApps(appsList);
+      if (event.action == "DELETE_APP") {
+        appsList.removeAt(event.index);
+        appsStorage.writeApps(appsList);
         yield AppDeleted("App well deleted");
       }
       yield AppsInitial();
@@ -41,7 +47,20 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
     if (event is LaunchUpdateApp) {
       appsList[event.index].name = event.newName;
       appsList[event.index].path = event.newPath;
+      appsList[event.index].categoryValue = event.newCategoryValue;
       yield AppUpdated("App well updated");
+    }
+    if (event is LaunchCreateCategory) {
+      categoriesList.add(event.category);
+      categoriesStorage.writeApps(categoriesList);
+
+      yield CategoryCreated("Category well created");
+      yield AppsInitial();
+    }
+    if (event is LaunchUpdateCategory) {
+      categoriesList[event.index].name = event.category.name;
+      categoriesList[event.index].value = event.category.value;
+      yield CategoryUpdated("Category well updated");
     }
     yield AppsInitial();
   }

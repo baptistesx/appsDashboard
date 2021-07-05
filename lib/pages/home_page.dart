@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lachenal_app/pages/apps_page.dart';
 
 import '../bloc/apps_bloc.dart';
-import '../models/executable_app.dart';
-import '../resources/globals.dart' as globals;
-import '../resources/globals.dart';
-import '../utils/apps_storage.dart';
-import '../widgets/executable_apps_list.dart';
-import '../widgets/executable_button.dart';
-import '../widgets/expandable_fab.dart';
+import 'apps_page.dart';
 
 class HomePage extends StatelessWidget {
   HomePageParams data;

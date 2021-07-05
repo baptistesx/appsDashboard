@@ -4,8 +4,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lachenal_app/main.dart';
 import '../bloc/apps_bloc.dart';
 import 'app_form_dialog.dart';
+import 'category_form_dialog.dart';
 
 @immutable
 class CustomExpandableFab extends StatelessWidget {
@@ -13,11 +15,26 @@ class CustomExpandableFab extends StatelessWidget {
 
   const CustomExpandableFab({Key? key}) : super(key: key);
 
-  void _showCreateAppFormDialog(BuildContext context, int index) {
+  void _showCreateAppFormDialog(BuildContext context) {
     showDialog<void>(
       context: context,
       builder: (context) {
-        return AppFormDialog(index: null);
+        return const AppFormDialog(
+          index: null,
+          app: null,
+        );
+      },
+    );
+  }
+
+  void _showCreateCategoryFormDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return const CategoryFormDialog(
+          index: null,
+          category: null,
+        );
       },
     );
   }
@@ -27,10 +44,14 @@ class CustomExpandableFab extends StatelessWidget {
     return ExpandableFab(
       distance: 112.0,
       children: [
+        categoriesList.length > 1
+            ? ActionButton(
+                onPressed: () => _showCreateAppFormDialog(context),
+                icon: Icon(Icons.app_registration))
+            : Container(),
         ActionButton(
-          onPressed: () => _showCreateAppFormDialog(context, 0),
-          icon: const Icon(Icons.add),
-        ),
+            onPressed: () => _showCreateCategoryFormDialog(context),
+            icon: Icon(Icons.sort)),
       ],
     );
   }
@@ -168,7 +189,7 @@ class _ExpandableFabState extends State<ExpandableFab>
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
             onPressed: _toggle,
-            child: const Icon(Icons.create),
+            child: const Icon(Icons.add),
           ),
         ),
       ),
