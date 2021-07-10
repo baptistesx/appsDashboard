@@ -30,7 +30,10 @@ class _categoriesListListState extends State<CategoriesList> {
 
         return apps.length > 0
             ? CategoryExpansionCard(
-                apps: apps, index: index, category: categoriesList[index])
+                apps: apps,
+                index: index,
+                category: categoriesList[index],
+                optionsAvailable: widget.optionsAvailable)
             : Container();
       },
     );
@@ -61,12 +64,14 @@ class CategoryExpansionCard extends StatelessWidget {
   final List<Padding> apps;
   final Category category;
   final int index;
+  final bool optionsAvailable;
 
   CategoryExpansionCard(
       {Key? key,
       required this.apps,
       required this.category,
-      required this.index})
+      required this.index,
+      required this.optionsAvailable})
       : super(key: key);
 
   @override
@@ -82,11 +87,13 @@ class CategoryExpansionCard extends StatelessWidget {
                 SizedBox(
                   width: 20,
                 ),
-                IconButton(
-                    onPressed: () {
-                      _showCategoyDialog(context, index, category);
-                    },
-                    icon: Icon(Icons.edit))
+                optionsAvailable
+                    ? IconButton(
+                        onPressed: () {
+                          _showCategoyDialog(context, index, category);
+                        },
+                        icon: Icon(Icons.edit))
+                    : Container()
               ],
             ),
             children: apps));
