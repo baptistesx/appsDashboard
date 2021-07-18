@@ -26,7 +26,7 @@ class _categoriesListListState extends State<CategoriesList> {
       physics: BouncingScrollPhysics(),
       itemCount: categoriesList.length,
       itemBuilder: (BuildContext context, int index) {
-        List<Padding> apps = _getAppsList(categoriesList[index]);
+        List<Padding> apps = _getAppsList(categoriesList[index], index);
 
         return apps.length > 0
             ? CategoryExpansionCard(
@@ -39,20 +39,19 @@ class _categoriesListListState extends State<CategoriesList> {
     );
   }
 
-  List<Padding> _getAppsList(category) {
-    List<ExecutableApp> list = appsList.where((i) {
-      return i.categoryValue == category.value;
-    }).toList();
+  List<Padding> _getAppsList(category, categoryIndex) {
+    List<ExecutableApp> list = category.apps;
 
     return list.map((e) {
-      var index = list.indexOf(e);
+      var appIndex = list.indexOf(e);
 
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Center(
           child: AppCard(
-              index: index,
-              app: appsList[index],
+              categoryIndex: categoryIndex,
+              appIndex: appIndex,
+              app: e,
               optionsAvailable: widget.optionsAvailable),
         ),
       );

@@ -8,7 +8,7 @@ abstract class AppsEvent {
 class LaunchCreateApp extends AppsEvent {
   final ExecutableApp app;
 
-  LaunchCreateApp(this.app);
+  LaunchCreateApp({required this.app});
 }
 
 class LaunchExecuteApp extends AppsEvent {
@@ -24,23 +24,32 @@ class LaunchDeleteApp extends AppsEvent {
 }
 
 class LaunchUpdateApp extends AppsEvent {
-  final int index;
+  final int categoryIndex;
+  final int appIndex;
   final String newName;
   final String newPath;
   final String newCategoryValue;
 
-  LaunchUpdateApp(
-      {required this.index,
-      required this.newName,
-      required this.newPath,
-      required this.newCategoryValue});
+  LaunchUpdateApp({
+    required this.categoryIndex,
+    required this.appIndex,
+    required this.newName,
+    required this.newPath,
+    required this.newCategoryValue,
+  });
 }
 
 class LaunchOpenConfirmActionDialog extends AppsEvent {
-  int index;
+  int appIndex;
   String action;
+  String categoryValue;
+  int categoryIndex;
 
-  LaunchOpenConfirmActionDialog({required this.index, required this.action});
+  LaunchOpenConfirmActionDialog(
+      {required this.categoryValue,
+      required this.categoryIndex,
+      required this.appIndex,
+      required this.action});
 }
 
 class LaunchOpenAppDialog extends AppsEvent {

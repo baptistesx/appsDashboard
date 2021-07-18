@@ -6,13 +6,15 @@ import '../models/executable_app.dart';
 import 'app_form_dialog.dart';
 
 class AppCard extends StatelessWidget {
-  int index;
+  int categoryIndex;
+  int appIndex;
   ExecutableApp app;
   bool optionsAvailable;
 
   AppCard(
       {Key? key,
-      required this.index,
+      required this.categoryIndex,
+      required this.appIndex,
       required this.app,
       required this.optionsAvailable})
       : super(key: key);
@@ -46,7 +48,12 @@ class AppCard extends StatelessWidget {
                           TextButton(
                             child: const Text('EDITER'),
                             onPressed: () {
-                              _showAppDialog(context, index, app);
+                              _showAppDialog(
+                                context,
+                                categoryIndex,
+                                appIndex,
+                                app,
+                              );
                             },
                           ),
                           const SizedBox(width: 8),
@@ -85,7 +92,10 @@ class AppCard extends StatelessWidget {
 
               BlocProvider.of<AppsBloc>(context).add(
                   LaunchOpenConfirmActionDialog(
-                      index: index, action: "DELETE_APP"));
+                      categoryValue: "TODO",
+                      categoryIndex: categoryIndex,
+                      appIndex: appIndex,
+                      action: "DELETE_APP"));
             },
             child: const Text('OK'),
           ),
@@ -94,11 +104,13 @@ class AppCard extends StatelessWidget {
     );
   }
 
-  void _showAppDialog(BuildContext context, int? index, ExecutableApp? app) {
+  void _showAppDialog(BuildContext context, int? categoryIndex, int? appindex,
+      ExecutableApp? app) {
     showDialog<void>(
       context: context,
       builder: (context) {
-        return AppFormDialog(index: index, app: app);
+        return AppFormDialog(
+            categoryIndex: categoryIndex, appIndex: appIndex, app: app);
       },
     );
   }

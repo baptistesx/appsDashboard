@@ -93,13 +93,15 @@ class CategoryFormDialogState extends State<CategoryFormDialog> {
                 BlocProvider.of<AppsBloc>(context).add(LaunchCreateCategory(
                     category: Category(
                         name: nameController.text.capitalize(),
-                        value: nameController.text.toLowerCase())));
+                        value: nameController.text.toLowerCase(),
+                        apps: [])));
               } else {
                 BlocProvider.of<AppsBloc>(context).add(LaunchUpdateCategory(
                     index: widget.index!,
                     category: Category(
                         name: nameController.text.capitalize(),
-                        value: nameController.text.toLowerCase())));
+                        value: nameController.text.toLowerCase(),
+                        apps: [])));
               }
 
               // appsList.add(ExecutableApp(, path))

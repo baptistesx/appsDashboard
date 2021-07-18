@@ -12,15 +12,18 @@ class ExecutableApp {
     return {
       'name': name,
       'path': path,
-      'category': categoryValue,
+      'categoryValue': categoryValue,
     };
   }
 
   factory ExecutableApp.fromMap(Map<String, dynamic> map) {
+    print(map);
+    print(map["name"]);
+    print(map["name"] is String);
     return ExecutableApp(
       name: map['name'],
       path: map['path'],
-      categoryValue: map['category'],
+      categoryValue: map['categoryValue'],
     );
   }
 

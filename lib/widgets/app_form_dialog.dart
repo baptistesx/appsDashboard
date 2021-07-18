@@ -8,10 +8,15 @@ import 'package:lachenal_app/models/executable_app.dart';
 import "string_extension.dart";
 
 class AppFormDialog extends StatefulWidget {
-  final int? index;
+  final int? categoryIndex;
+  final int? appIndex;
   final ExecutableApp? app;
 
-  const AppFormDialog({Key? key, required this.index, required this.app})
+  const AppFormDialog(
+      {Key? key,
+      required this.categoryIndex,
+      required this.appIndex,
+      required this.app})
       : super(key: key);
 
   @override
@@ -38,18 +43,16 @@ class AppFormDialogState extends State<AppFormDialog> {
   void initState() {
     super.initState();
 
-    if (widget.index != null) {
-      nameController =
-          TextEditingController(text: appsList[widget.index!].name);
-      pathController =
-          TextEditingController(text: appsList[widget.index!].path);
+    if (widget.appIndex != null) {
+      nameController = TextEditingController(text: widget.app!.name);
+      pathController = TextEditingController(text: widget.app!.path);
       dropdownValue = categoriesList
           .where((element) => element.value == widget.app!.categoryValue)
           .first
           .value;
     }
 
-    isCreateDialog = widget.index == null;
+    isCreateDialog = widget.appIndex == null;
   }
 
   @override
@@ -134,13 +137,14 @@ class AppFormDialogState extends State<AppFormDialog> {
             if (_formKey.currentState!.validate() && dropdownValue != "") {
               if (isCreateDialog) {
                 BlocProvider.of<AppsBloc>(context).add(LaunchCreateApp(
-                    ExecutableApp(
+                    app: ExecutableApp(
                         name: nameController.text,
                         path: pathController.text,
                         categoryValue: dropdownValue)));
               } else {
                 BlocProvider.of<AppsBloc>(context).add(LaunchUpdateApp(
-                    index: widget.index!,
+                    categoryIndex: widget.categoryIndex!,
+                    appIndex: widget.appIndex!,
                     newName: nameController.text,
                     newPath: pathController.text,
                     newCategoryValue: dropdownValue));

@@ -20,7 +20,8 @@ class CustomExpandableFab extends StatelessWidget {
       context: context,
       builder: (context) {
         return const AppFormDialog(
-          index: null,
+          appIndex: null,
+          categoryIndex: null,
           app: null,
         );
       },

@@ -20,8 +20,11 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
     AppsEvent event,
   ) async* {
     if (event is LaunchCreateApp) {
-      appsList.add(event.app);
-      appsStorage.writeApps(appsList);
+      categoriesList
+          .firstWhere((e) => e.value == event.app.categoryValue)
+          .apps
+          .add(event.app);
+      categoriesStorage.writeCategories(categoriesList);
 
       yield AppCreated("App well created");
       yield AppsInitial();
@@ -38,17 +41,37 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
     }
     if (event is LaunchOpenConfirmActionDialog) {
       if (event.action == "DELETE_APP") {
-        appsList.removeAt(event.index);
-        appsStorage.writeApps(appsList);
+        categoriesList[event.categoryIndex].apps.removeAt(event.appIndex);
+        categoriesStorage.writeCategories(categoriesList);
         yield AppDeleted("App well deleted");
       }
       yield AppsInitial();
     }
     if (event is LaunchUpdateApp) {
-      appsList[event.index].name = event.newName;
-      appsList[event.index].path = event.newPath;
-      appsList[event.index].categoryValue = event.newCategoryValue;
-      appsStorage.writeApps(appsList);
+      categoriesList[event.categoryIndex].apps[event.appIndex].name =
+          event.newName;
+      categoriesList[event.categoryIndex].apps[event.appIndex].categoryValue =
+          event.newCategoryValue;
+      categoriesList[event.categoryIndex].apps[event.appIndex].path =
+          event.newPath;
+
+      ExecutableApp app =
+          categoriesList[event.categoryIndex].apps[event.appIndex];
+      //TODO add app to the new cat
+      categoriesList
+          .firstWhere((element) => element.value == event.newCategoryValue)
+          .apps
+          .add(app);
+
+      //TODO remove app from the old cat
+      categoriesList[event.categoryIndex].apps.removeAt(event.appIndex);
+      // ExecutableApp app = categoriesList
+      //     .firstWhere((e) => e.value == event.app.categoryValue)
+      //     .apps[event.index];
+      // app.name = event.newName;
+      // app.path = event.newPath;
+      // app.categoryValue = event.newCategoryValue;
+      categoriesStorage.writeCategories(categoriesList);
 
       yield AppUpdated("App well updated");
     }
@@ -60,14 +83,13 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
       yield AppsInitial();
     }
     if (event is LaunchUpdateCategory) {
-      appsList = appsList.map((e) {
-        if (e.categoryValue == categoriesList[event.index].value) {
-          e.categoryValue = event.category.value;
-        }
+      var appsList = categoriesList[event.index].apps.map((e) {
+        e.categoryValue = event.category.value;
         return e;
       }).toList();
-      appsStorage.writeApps(appsList);
+      // appsStorage.writeApps(appsList);
 
+      categoriesList[event.index].apps = appsList;
       categoriesList[event.index].name = event.category.name;
       categoriesList[event.index].value = event.category.value;
       categoriesStorage.writeCategories(categoriesList);

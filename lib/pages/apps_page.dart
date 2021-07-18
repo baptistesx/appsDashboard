@@ -62,6 +62,7 @@ class _AppsPageState extends State<AppsPage> {
               ]),
               backgroundColor: Colors.red[400],
             );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
           } else if (state is SuccessActionState) {
             snackBar = SnackBar(
               duration: const Duration(seconds: 1),
@@ -72,9 +73,8 @@ class _AppsPageState extends State<AppsPage> {
               ]),
               backgroundColor: Colors.green[400],
             );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
-
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }, builder: (context, state) {
           return CategoriesList(optionsAvailable: isAdmin);
         }),
