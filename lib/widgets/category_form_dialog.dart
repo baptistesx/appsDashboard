@@ -1,12 +1,10 @@
 // Create a Form widget.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:lachenal_app/bloc/apps_bloc.dart';
 import 'package:lachenal_app/main.dart';
 import 'package:lachenal_app/models/category.dart';
-import 'package:lachenal_app/models/executable_app.dart';
-import 'package:lachenal_app/resources/globals.dart';
+
 import "string_extension.dart";
 
 class CategoryFormDialog extends StatefulWidget {

@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:firedart/firestore/firestore.dart';
 import 'package:firedart/firestore/models.dart';
-import 'package:lachenal_app/models/executable_app.dart';
+import '../main.dart';
+import 'executable_app.dart';
 
 class Category {
   String value;
@@ -45,13 +47,52 @@ class Category {
   factory Category.fromJson(String source) =>
       Category.fromMap(json.decode(source));
 
-  
-
   @override
   String toString() => 'Category(value: $value, name: $name)';
 }
 
-ExecutableApp test() {
-  return ExecutableApp(
-      name: "name", path: "path", categoryValue: "categoryValue");
+void addEmptyCategoryIfNotExists() {
+  categoriesList.firstWhere((element) => element.name == "", orElse: () {
+    categoriesList.add(Category(value: "", name: "", apps: []));
+    return Category(value: "", name: "", apps: []);
+  });
+}
+
+Future<void> getCategoriesFromLocalFile() async {
+  print("pb connexion");
+  await categoriesStorage.readEntities().then((List<Category> value) {
+    categoriesList = value;
+  });
+
+  //TODO add timer to try resync
+}
+
+Future<void> getCategoriesFromFirestore() async {
+  // Instantiate a reference to a document - this happens offline
+  var ref = Firestore.instance.collection('categories'); //.document('doc');
+
+  // Subscribe to changes to that document
+  // ref.stream.listen((cat) => print('updated: $cat'));
+
+  // Update the document
+  // await ref.update({'value': 'test'});
+
+  // Get a snapshot of the document
+  var categories = await ref.get();
+  print(categories[0].id);
+  categories.forEach((category) {
+    List apps = category.map['apps'];
+    List<ExecutableApp> executablesApps = apps
+        .map((app) => ExecutableApp(
+            name: app['name'], path: app['path'], categoryValue: category.id))
+        .toList();
+    print(apps);
+    Category cat = Category(
+        value: category.id, name: category.map['name'], apps: executablesApps);
+    print(cat);
+
+    categoriesList.add(cat);
+  });
+
+  isSync = true;
 }

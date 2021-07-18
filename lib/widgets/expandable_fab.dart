@@ -4,7 +4,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lachenal_app/main.dart';
+import '../main.dart';
 import '../bloc/apps_bloc.dart';
 import 'app_form_dialog.dart';
 import 'category_form_dialog.dart';
