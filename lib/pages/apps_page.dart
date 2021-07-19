@@ -21,63 +21,68 @@ class _AppsPageState extends State<AppsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text(widget.data.title), actions: [
-          Row(
-            children: [
-              Text("Administrateur"),
-              Switch(
-                value: isAdmin,
-                onChanged: (isOn) {
-                  if (isOn) {
-                    showPinCodeDialog(context);
-                  } else {
-                    setState(() {
-                      isAdmin = false;
-                    });
-                  }
-                  // open dialog
-                },
-                activeTrackColor: Colors.lightGreenAccent,
-                activeColor: Colors.green,
-              ),
-            ],
-          ),
-        ]),
-        body: BlocConsumer<AppsBloc, AppsState>(listener: (context, state) {
-          var snackBar;
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+          appBar: AppBar(
+              automaticallyImplyLeading: false,
+              title: Text(widget.data.title),
+              actions: [
+                Row(
+                  children: [
+                    Text("Administrateur"),
+                    Switch(
+                      value: isAdmin,
+                      onChanged: (isOn) {
+                        if (isOn) {
+                          showPinCodeDialog(context);
+                        } else {
+                          setState(() {
+                            isAdmin = false;
+                          });
+                        }
+                      },
+                      activeTrackColor: Colors.lightGreenAccent,
+                      activeColor: Colors.green,
+                    ),
+                  ],
+                ),
+              ]),
+          body: BlocConsumer<AppsBloc, AppsState>(listener: (context, state) {
+            var snackBar;
 
-          if (state is ErrorLaunchingApp) {
-            snackBar = SnackBar(
-              duration: const Duration(seconds: 1),
-              content: Row(children: [
-                Icon(Icons.warning),
-                SizedBox(width: 10),
-                Text(state.message),
-              ]),
-              backgroundColor: Colors.red[400],
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          } else if (state is SuccessActionState) {
-            snackBar = SnackBar(
-              duration: const Duration(seconds: 1),
-              content: Row(children: [
-                Icon(Icons.check),
-                SizedBox(width: 10),
-                Text(state.message),
-              ]),
-              backgroundColor: Colors.green[400],
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          }
-        }, builder: (context, state) {
-          return CategoriesList(optionsAvailable: isAdmin);
-        }),
-        floatingActionButton: BlocBuilder<AppsBloc, AppsState>(
-          builder: (context, state) {
-            return isAdmin ? CustomExpandableFab() : Container();
-          },
-        ));
+            if (state is ErrorLaunchingApp) {
+              snackBar = SnackBar(
+                duration: const Duration(seconds: 1),
+                content: Row(children: [
+                  Icon(Icons.warning),
+                  SizedBox(width: 10),
+                  Text(state.message),
+                ]),
+                backgroundColor: Colors.red[400],
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            } else if (state is SuccessActionState) {
+              snackBar = SnackBar(
+                duration: const Duration(seconds: 1),
+                content: Row(children: [
+                  Icon(Icons.check),
+                  SizedBox(width: 10),
+                  Text(state.message),
+                ]),
+                backgroundColor: Colors.green[400],
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
+          }, builder: (context, state) {
+            return CategoriesList(optionsAvailable: isAdmin);
+          }),
+          floatingActionButton: BlocBuilder<AppsBloc, AppsState>(
+            builder: (context, state) {
+              return isAdmin ? CustomExpandableFab() : Container();
+            },
+          )),
+    );
   }
 
   void showPinCodeDialog(BuildContext context) {

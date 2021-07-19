@@ -5,7 +5,11 @@ abstract class AppsState {
   AppsState([List props = const <dynamic>[]]);
 }
 
-class AppsInitial extends AppsState {}
+class AppNotInitialized extends AppsState {}
+
+class AppInitialized extends AppsState {}
+
+class ErrorAppNotInitialized extends AppsState {}
 
 class ErrorLaunchingApp extends AppsState {
   final String message;

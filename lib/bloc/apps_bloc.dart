@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:lachenal_app/utils/firebase_info.dart';
 import '../models/category.dart';
 import '../resources/globals.dart';
 import '../models/executable_app.dart';
@@ -13,12 +14,29 @@ part 'apps_event.dart';
 part 'apps_state.dart';
 
 class AppsBloc extends Bloc<AppsEvent, AppsState> {
-  AppsBloc() : super(AppsInitial());
+  AppsBloc() : super(AppNotInitialized());
 
   @override
   Stream<AppsState> mapEventToState(
     AppsEvent event,
   ) async* {
+    if (event is LaunchInitApp) {
+      if (!isAuthenticated) {
+        isAuthenticated = await firebaseAuthenticate();
+
+        if (isAuthenticated) {
+          await getCategoriesFromFirestore();
+        } else {
+          await getCategoriesFromLocalFile();
+        }
+
+        addEmptyCategoryIfNotExists();
+
+        categoriesStorage.writeCategories(categoriesList);
+
+        yield AppInitialized();
+      }
+    }
     if (event is LaunchCreateApp) {
       categoriesList
           .firstWhere((e) => e.value == event.app.categoryValue)
@@ -27,16 +45,16 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
       categoriesStorage.writeCategories(categoriesList);
 
       yield AppCreated("App well created");
-      yield AppsInitial();
+      yield AppInitialized();
     }
     if (event is LaunchExecuteApp) {
       try {
         ProcessResult results = await Process.run(event.app.path, []);
         yield AppLaunched("App well launched");
-        yield AppsInitial();
+        yield AppInitialized();
       } on ProcessException catch (e) {
         yield ErrorLaunchingApp("Failed to launch app, check the pathfile");
-        yield AppsInitial();
+        yield AppInitialized();
       }
     }
     if (event is LaunchOpenConfirmActionDialog) {
@@ -45,7 +63,7 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
         categoriesStorage.writeCategories(categoriesList);
         yield AppDeleted("App well deleted");
       }
-      yield AppsInitial();
+      yield AppInitialized();
     }
     if (event is LaunchUpdateApp) {
       categoriesList[event.categoryIndex].apps[event.appIndex].name =
@@ -80,7 +98,7 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
       categoriesStorage.writeCategories(categoriesList);
 
       yield CategoryCreated("Category well created");
-      yield AppsInitial();
+      yield AppInitialized();
     }
     if (event is LaunchUpdateCategory) {
       var appsList = categoriesList[event.index].apps.map((e) {
@@ -95,6 +113,6 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
       categoriesStorage.writeCategories(categoriesList);
       yield CategoryUpdated("Category well updated");
     }
-    yield AppsInitial();
+    yield AppInitialized();
   }
 }

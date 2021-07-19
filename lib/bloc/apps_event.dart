@@ -5,6 +5,10 @@ abstract class AppsEvent {
   AppsEvent([List props = const <dynamic>[]]);
 }
 
+class LaunchInitApp extends AppsEvent {
+  LaunchInitApp();
+}
+
 class LaunchCreateApp extends AppsEvent {
   final ExecutableApp app;
 

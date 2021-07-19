@@ -60,11 +60,13 @@ void addEmptyCategoryIfNotExists() {
 
 Future<void> getCategoriesFromLocalFile() async {
   print("pb connexion");
+  //TODO try catch => Launch ErrorAppNotInitialized
   await categoriesStorage.readEntities().then((List<Category> value) {
     categoriesList = value;
   });
 
   //TODO add timer to try resync
+  //Display icon to show app is not sync
 }
 
 Future<void> getCategoriesFromFirestore() async {

@@ -16,20 +16,9 @@ import 'pages/apps_page.dart';
 CategoriesStorage categoriesStorage = CategoriesStorage();
 List<Category> categoriesList = [];
 bool isSync = false;
+bool isAuthenticated = false;
 
 Future main() async {
-  bool isAuthenticated = await firebaseAuthenticate();
-
-  if (isAuthenticated) {
-    await getCategoriesFromFirestore();
-  } else {
-    await getCategoriesFromLocalFile();
-  }
-
-  addEmptyCategoryIfNotExists();
-
-  categoriesStorage.writeCategories(categoriesList);
-
   runApp(const DashboardAppsApp());
 }
 
