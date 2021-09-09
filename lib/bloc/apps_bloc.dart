@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:firedart/firedart.dart';
 import 'package:lachenal_app/utils/firebase_info.dart';
 import '../models/category.dart';
 import '../resources/globals.dart';
@@ -23,17 +24,18 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
     if (event is LaunchInitApp) {
       if (!isAuthenticated) {
         isAuthenticated = await firebaseAuthenticate();
+        // var ref = Firestore.instance.collection('categories');
 
         if (isAuthenticated) {
-          await getCategoriesFromFirestore();
+  categoriesList = List.from(await getCategoriesFromFirestore());
         } else {
-          await getCategoriesFromLocalFile();
+  categoriesList = List.from(await getCategoriesFromLocalFile());
         }
 
-        addEmptyCategoryIfNotExists();
+        // addEmptyCategoryIfNotExists();
 
         categoriesStorage.writeCategories(categoriesList);
-
+        yield AppNotInitialized();
         yield AppInitialized();
       }
     }
@@ -42,7 +44,8 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
           .firstWhere((e) => e.value == event.app.categoryValue)
           .apps
           .add(event.app);
-      categoriesStorage.writeCategories(categoriesList);
+
+      await saveCategories();
 
       yield AppCreated("App well created");
       yield AppInitialized();
@@ -60,7 +63,9 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
     if (event is LaunchOpenConfirmActionDialog) {
       if (event.action == "DELETE_APP") {
         categoriesList[event.categoryIndex].apps.removeAt(event.appIndex);
-        categoriesStorage.writeCategories(categoriesList);
+
+        await saveCategories();
+
         yield AppDeleted("App well deleted");
       }
       yield AppInitialized();
@@ -83,34 +88,31 @@ class AppsBloc extends Bloc<AppsEvent, AppsState> {
 
       //TODO remove app from the old cat
       categoriesList[event.categoryIndex].apps.removeAt(event.appIndex);
-      // ExecutableApp app = categoriesList
-      //     .firstWhere((e) => e.value == event.app.categoryValue)
-      //     .apps[event.index];
-      // app.name = event.newName;
-      // app.path = event.newPath;
-      // app.categoryValue = event.newCategoryValue;
-      categoriesStorage.writeCategories(categoriesList);
+
+      await saveCategories();
 
       yield AppUpdated("App well updated");
     }
     if (event is LaunchCreateCategory) {
       categoriesList.add(event.category);
-      categoriesStorage.writeCategories(categoriesList);
+
+      await createCategory();
 
       yield CategoryCreated("Category well created");
       yield AppInitialized();
     }
     if (event is LaunchUpdateCategory) {
-      var appsList = categoriesList[event.index].apps.map((e) {
+      categoriesList[event.index].apps.forEach((e) {
         e.categoryValue = event.category.value;
-        return e;
-      }).toList();
+      });
       // appsStorage.writeApps(appsList);
 
-      categoriesList[event.index].apps = appsList;
+      // categoriesList[event.index].apps = appsList;
       categoriesList[event.index].name = event.category.name;
       categoriesList[event.index].value = event.category.value;
-      categoriesStorage.writeCategories(categoriesList);
+      await removeCategory(event.index);
+      await saveCategories();
+
       yield CategoryUpdated("Category well updated");
     }
     yield AppInitialized();

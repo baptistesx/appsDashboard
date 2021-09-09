@@ -45,7 +45,7 @@ class CustomExpandableFab extends StatelessWidget {
     return ExpandableFab(
       distance: 112.0,
       children: [
-        categoriesList.length > 1
+        categoriesList.length > 0
             ? ActionButton(
                 onPressed: () => _showCreateAppFormDialog(context),
                 icon: Icon(Icons.app_registration))

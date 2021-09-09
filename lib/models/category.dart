@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firedart/firestore/firestore.dart';
 import 'package:firedart/firestore/models.dart';
+
 import '../main.dart';
 import 'executable_app.dart';
 
@@ -48,28 +49,33 @@ class Category {
       Category.fromMap(json.decode(source));
 
   @override
-  String toString() => 'Category(value: $value, name: $name)';
+  String toString() => 'Category(value: $value, name: $name, apps: $apps)';
 }
 
-void addEmptyCategoryIfNotExists() {
-  categoriesList.firstWhere((element) => element.name == "", orElse: () {
-    categoriesList.add(Category(value: "", name: "", apps: []));
-    return Category(value: "", name: "", apps: []);
-  });
-}
+// void addEmptyCategoryIfNotExists() {
+//   categoriesList.firstWhere((element) => element.name == "", orElse: () {
+//     categoriesList.add(Category(value: "", name: "", apps: []));
+//     return Category(value: "", name: "", apps: []);
+//   });
+// }
 
-Future<void> getCategoriesFromLocalFile() async {
+Future<List<Category>> getCategoriesFromLocalFile() async {
+  List<Category> categoriesFromLocalFile = [];
+
   print("pb connexion");
   //TODO try catch => Launch ErrorAppNotInitialized
   await categoriesStorage.readEntities().then((List<Category> value) {
-    categoriesList = value;
+    categoriesFromLocalFile = value;
   });
 
   //TODO add timer to try resync
   //Display icon to show app is not sync
+
+  return categoriesFromLocalFile;
 }
 
-Future<void> getCategoriesFromFirestore() async {
+Future<List<Category>> getCategoriesFromFirestore() async {
+  List<Category> categoriesListFromFirestore = [];
   // Instantiate a reference to a document - this happens offline
   var ref = Firestore.instance.collection('categories'); //.document('doc');
 
@@ -81,20 +87,69 @@ Future<void> getCategoriesFromFirestore() async {
 
   // Get a snapshot of the document
   var categories = await ref.get();
-  print(categories[0].id);
-  categories.forEach((category) {
-    List apps = category.map['apps'];
-    List<ExecutableApp> executablesApps = apps
-        .map((app) => ExecutableApp(
-            name: app['name'], path: app['path'], categoryValue: category.id))
-        .toList();
-    print(apps);
-    Category cat = Category(
-        value: category.id, name: category.map['name'], apps: executablesApps);
-    print(cat);
 
-    categoriesList.add(cat);
-  });
+  if (categories.length > 0) {
+    categoriesListFromFirestore = categories.map((category) {
+      List apps = category.map['apps'];
+      List<ExecutableApp> executablesApps = apps
+          .map((app) => ExecutableApp(
+              name: app['name'], path: app['path'], categoryValue: category.id))
+          .toList();
+
+      Category cat = Category(
+          value: category.id,
+          name: category.map['name'],
+          apps: executablesApps);
+
+      return cat;
+    }).toList();
+  }
 
   isSync = true;
+  print(categoriesListFromFirestore);
+  return categoriesListFromFirestore;
+}
+
+Future<void> removeCategory(index) async {
+  // categoriesList.firstWhere((element) => )
+  // categoriesList.forEach((category) async {
+  //   if (category.value != "") {
+  //     var ref =
+  //         Firestore.instance.collection('categories').document(category.value);
+
+  //     await ref.update({
+  //       'name': category.name,
+  //       'apps': category.apps.map((e) => json.decode(e.toJson())).toList()
+  //     });
+  //   }
+  // });
+  // categoriesList = [];
+  // await getCategoriesFromFirestore();
+  // await categoriesStorage.writeCategories(categoriesList);
+}
+
+Future<void> createCategory() async {
+  var ref = Firestore.instance.collection('categories');
+
+  await ref.add(
+      {'name': categoriesList[categoriesList.length - 1].name, 'apps': []});
+  // categoriesList = [];
+
+  categoriesList = List.from(await getCategoriesFromFirestore());
+  await categoriesStorage.writeCategories(categoriesList);
+}
+
+Future<void> saveCategories() async {
+  categoriesList.forEach((category) async {
+    var ref =
+        Firestore.instance.collection('categories').document(category.value);
+
+    await ref.update({
+      'name': category.name,
+      'apps': category.apps.map((e) => json.decode(e.toJson())).toList()
+    });
+  });
+  // categoriesList = [];
+  categoriesList = List.from(await getCategoriesFromFirestore());
+  await categoriesStorage.writeCategories(categoriesList);
 }

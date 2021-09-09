@@ -1,8 +1,10 @@
 // Create a Form widget.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:lachenal_app/bloc/apps_bloc.dart';
 import 'package:lachenal_app/main.dart';
+import 'package:lachenal_app/models/category.dart';
 import 'package:lachenal_app/models/executable_app.dart';
 
 import "string_extension.dart";
@@ -65,6 +67,11 @@ class AppFormDialogState extends State<AppFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    List<Category> catList = List.from(categoriesList);
+    if (!catList.any((e) => e.name == "")) {
+      catList.add(Category(value: "", name: "", apps: []));
+    }
+
     return AlertDialog(
       content: Form(
         key: _formKey,
@@ -108,14 +115,14 @@ class AppFormDialogState extends State<AppFormDialog> {
                   dropdownValue = newValue!;
                 });
               },
-              items: categoriesList
-                  .map((e) => e.value)
+              items: catList
+                  .map((e) => DropDownItem(value: e.value, name: e.name))
                   .toList()
-                  .map<DropdownMenuItem<String>>((String value) {
-                return value != ""
+                  .map<DropdownMenuItem<String>>((DropDownItem item) {
+                return item.value != ""
                     ? DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value.capitalize()),
+                        value: item.value,
+                        child: Text(item.name.capitalize()),
                       )
                     : const DropdownMenuItem<String>(
                         value: "",
@@ -162,4 +169,14 @@ class AppFormDialogState extends State<AppFormDialog> {
     );
     // Build a Form widget using the _formKey created above.
   }
+}
+
+class DropDownItem {
+  String value;
+  String name;
+
+  DropDownItem({
+    required this.value,
+    required this.name,
+  });
 }
